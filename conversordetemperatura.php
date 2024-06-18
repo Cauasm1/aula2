@@ -4,50 +4,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+    <title>Converter moeda</title>
 </head>
 
 <body>
 
-    <h1>Conversor de temperatura</h1>
-    <form action="conversordetemperatura.php" method="POST">
-        <label for="temperatura">Temperatura:</label>
-        <input type="number" id="Temperatura" name="temperatura" step="0.01" required><br><br>
-        <label for="converter">Converter para:</label>
-        <select name="temp">
-            <option name="celsius">Celsius</option>
-            <option name="fahreinheit">Fahreinheit</option>
-        </select><br><br>
-        <input type="submit" value="Converter">
-        <input type="reset" value="Limpar">
-    </form>
-    <div class="Resposta">
-        <?php
+    <header>
+        <h1>Conversor de temperatura</h1>
+    </header>
 
+    <div class="container">
+        <h1>Converter moeda</h1>
+        <br>
+        <br>
+        <form action="conversormoedas.php" method="POST">
+            <label for="valor">Valor:</label>
+            <input type="number" name="valor" id="valor" step="0.01" required>
+            <br>
+            <label for="moeda_origem">De:</label>
+            <select name="moeda_origem" id="moeda_origem">
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="BRL">BRL</option>
+            </select>
+            <br>
+            <label for="moeda_destino">Para:</label>
+            <select name="moeda_destino" id="moeda_destino">
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="BRL">BRL</option>
+            </select>
+            <br>
+            <button type="submit">Converter</button>
+        </form>
+
+        <?php
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            if (isset($_POST['temperatura']) && isset($_POST['temp'])) {
-                $temperatura = $_POST['temperatura'];
-                $temp = $_POST['temp'];
-                $celsius = ($temperatura + 9 / 5) + 32;
-                $fahreinheit = ($temperatura - 32) * 5 / 9;
-                if ($temp = $celsius) {
-                    echo "O valor convertido é: $temp<br>";
-                } else if ($temp = $fahreinheit) {
-                    echo "O valor convertido é: $temp<br>";
-                }
-                $erro = (empty($temperatura)) ? "Todos os campos são obrigatórios" : ((!is_numeric($temperatura) || $temperatura <= 0 || $converter <= 0) ? "Por favor, insira valores válidos" : "");
-                if ($erro) {
-                    echo $erro;
-                } else {
-                    echo "O valor convertido é: <br>";
-                }
+            $moeda_origem = $_POST['moeda_origem'];
+            $moeda_destino = $_POST['moeda_destino'];
+            $valor = $_POST['valor'];
+
+            $conversao = [
+                'USD' => ['USD' => 1, 'EUR' => 0.85, 'BRL' => 5.20],
+                'EUR' => ['USD' => 1.18, 'EUR' => 1, 'BRL' => 6.12],
+                'BRL' => ['USD' => 0.19, 'EUR' => 0.16, 'BRL' => 1]
+            ];
+
+            if (isset($conversao[$moeda_origem][$moeda_destino])) {
+                $taxa = $conversao[$moeda_origem][$moeda_destino];
+                $valor_convertido = $valor * $taxa;
+
+                $simbolos = [
+                    'USD' => '$',
+                    'EUR' => '€',
+                    'BRL' => 'R$'
+                ];
+
+                $simbolo = $simbolos[$moeda_destino];
+                echo "<p>Valor convertido: {$simbolo} " . number_format($valor_convertido, 2) . "</p>";
             } else {
-                echo "Formulário não enviado corretamente";
+                echo "<p>Conversão não disponível.</p>";
             }
         }
         ?>
     </div>
-
 </body>
 
 </html>
